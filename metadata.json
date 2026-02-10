@@ -1,0 +1,5 @@
+{
+  "name": "DefectSeeker Pro",
+  "description": "A high-performance software defect tracking system featuring AI-powered severity prediction, role-based access control, and real-time dashboard analytics.",
+  "requestFramePermissions": []
+}
