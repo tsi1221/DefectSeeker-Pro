@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { MemoryRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { User, Defect, Project, Notification, UserRole } from './types';
+import { User, Defect, Project, Notification, UserRole, DefectStatus } from './types';
 import { INITIAL_DEFECTS, MOCK_USERS, MOCK_PROJECTS, INITIAL_NOTIFICATIONS } from './constants';
 import Dashboard from './components/Dashboard';
 import DefectList from './components/DefectList';
@@ -14,6 +14,8 @@ import Navbar from './components/Navbar';
 import ProjectList from './components/ProjectList';
 import Reports from './components/Reports';
 import Profile from './components/Profile';
+import UserManagement from './components/UserManagement';
+import SystemSettings from './components/SystemSettings';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -31,8 +33,15 @@ const App: React.FC = () => {
     return stored ? JSON.parse(stored) : MOCK_USERS;
   });
 
-  const [projects] = useState<Project[]>(MOCK_PROJECTS);
-  const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
+  const [projects, setProjects] = useState<Project[]>(() => {
+    const stored = localStorage.getItem('ds_projects');
+    return stored ? JSON.parse(stored) : MOCK_PROJECTS;
+  });
+
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
+    const stored = localStorage.getItem('ds_notifications');
+    return stored ? JSON.parse(stored) : INITIAL_NOTIFICATIONS;
+  });
 
   useEffect(() => {
     localStorage.setItem('ds_defects', JSON.stringify(defects));
@@ -43,12 +52,24 @@ const App: React.FC = () => {
   }, [registeredUsers]);
 
   useEffect(() => {
+    localStorage.setItem('ds_projects', JSON.stringify(projects));
+  }, [projects]);
+
+  useEffect(() => {
+    localStorage.setItem('ds_notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
+  useEffect(() => {
     if (currentUser) {
       localStorage.setItem('ds_user', JSON.stringify(currentUser));
+      const latest = registeredUsers.find(u => u.id === currentUser.id);
+      if (latest && JSON.stringify(latest) !== JSON.stringify(currentUser)) {
+        setCurrentUser(latest);
+      }
     } else {
       localStorage.removeItem('ds_user');
     }
-  }, [currentUser]);
+  }, [currentUser, registeredUsers]);
 
   const handleLogin = (user: User) => setCurrentUser(user);
   const handleLogout = () => setCurrentUser(null);
@@ -56,6 +77,18 @@ const App: React.FC = () => {
   const handleRegister = (newUser: User) => {
     setRegisteredUsers(prev => [...prev, newUser]);
     setCurrentUser(newUser);
+  };
+
+  const updateUserRole = (userId: string, newRole: UserRole) => {
+    setRegisteredUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
+  };
+
+  const deleteUser = (userId: string) => {
+    setRegisteredUsers(prev => prev.filter(u => u.id !== userId));
+  };
+
+  const addProject = (project: Project) => {
+    setProjects(prev => [project, ...prev]);
   };
 
   const addDefect = (defect: Defect) => {
@@ -80,6 +113,14 @@ const App: React.FC = () => {
     setDefects(prev => prev.filter(d => d.id !== id));
   };
 
+  const bulkUpdateStatus = (ids: string[], status: DefectStatus) => {
+    setDefects(prev => prev.map(d => ids.includes(d.id) ? { ...d, status, updatedAt: new Date().toISOString() } : d));
+  };
+
+  const bulkDelete = (ids: string[]) => {
+    setDefects(prev => prev.filter(d => !ids.includes(d.id)));
+  };
+
   const markNotificationRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
@@ -87,7 +128,6 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Auth Routes */}
         <Route 
           path="/login" 
           element={
@@ -101,7 +141,6 @@ const App: React.FC = () => {
           } 
         />
 
-        {/* Private Application Routes */}
         <Route
           path="/*"
           element={
@@ -118,12 +157,32 @@ const App: React.FC = () => {
                   <main className="flex-1 overflow-y-auto p-4 md:p-8">
                     <Routes>
                       <Route path="/" element={<Dashboard defects={defects} />} />
-                      <Route path="/defects" element={<DefectList defects={defects} users={registeredUsers} onDelete={deleteDefect} />} />
+                      <Route 
+                        path="/defects" 
+                        element={
+                          <DefectList 
+                            defects={defects} 
+                            users={registeredUsers} 
+                            onDelete={deleteDefect} 
+                            onBulkUpdateStatus={bulkUpdateStatus}
+                            onBulkDelete={bulkDelete}
+                            currentUser={currentUser}
+                          />
+                        } 
+                      />
                       <Route path="/defects/new" element={<DefectForm onSubmit={addDefect} currentUser={currentUser} users={registeredUsers} />} />
                       <Route path="/defects/:id" element={<DefectDetail defects={defects} users={registeredUsers} currentUser={currentUser} onUpdate={updateDefect} />} />
-                      <Route path="/projects" element={<ProjectList projects={projects} />} />
+                      <Route path="/projects" element={<ProjectList projects={projects} onAddProject={addProject} />} />
                       <Route path="/reports" element={<Reports defects={defects} projects={projects} />} />
                       <Route path="/profile" element={<Profile user={currentUser} onUpdate={(u) => setCurrentUser(u)} />} />
+                      
+                      {currentUser.role === UserRole.MANAGER && (
+                        <>
+                          <Route path="/users" element={<UserManagement users={registeredUsers} onUpdateRole={updateUserRole} onDeleteUser={deleteUser} />} />
+                          <Route path="/settings" element={<SystemSettings />} />
+                        </>
+                      )}
+
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </main>
