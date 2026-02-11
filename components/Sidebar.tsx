@@ -10,50 +10,52 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const links = [
     { to: '/', icon: 'fa-chart-pie', label: 'Dashboard' },
-    { to: '/defects', icon: 'fa-bug', label: 'Defects' },
+    { to: '/defects', icon: 'fa-bug', label: 'Inventory' },
     { to: '/projects', icon: 'fa-diagram-project', label: 'Projects' },
-    { to: '/reports', icon: 'fa-file-lines', label: 'Reports' },
+    { to: '/reports', icon: 'fa-file-lines', label: 'Analytics' },
   ];
 
-  if (role === UserRole.QA || role === UserRole.MANAGER) {
-    links.push({ to: '/defects/new', icon: 'fa-plus-circle', label: 'Report Defect' });
+  if (role === UserRole.QA || role === UserRole.MANAGER || role === UserRole.ADMIN) {
+    links.push({ to: '/defects/new', icon: 'fa-plus-circle', label: 'Log Incident' });
   }
 
-  // Management section for Admin/Managers
   const managementLinks = [];
-  if (role === UserRole.MANAGER) {
+  if (role === UserRole.MANAGER || role === UserRole.ADMIN) {
     managementLinks.push({ to: '/users', icon: 'fa-users-gear', label: 'Team Directory' });
+  }
+  
+  if (role === UserRole.ADMIN) {
     managementLinks.push({ to: '/settings', icon: 'fa-gears', label: 'System Config' });
   }
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-white shadow-2xl z-20">
-      <div className="p-8 flex items-center gap-3">
-        <div className="w-11 h-11 bg-indigo-600 rounded-[1.2rem] flex items-center justify-center shadow-lg shadow-indigo-600/30">
+    <aside className="hidden lg:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 overflow-hidden">
+      <div className="p-10 flex items-center gap-4">
+        <div className="w-12 h-12 bg-indigo-600 rounded-[1.2rem] flex items-center justify-center shadow-2xl shadow-indigo-600/40 transform rotate-3 hover:rotate-0 transition-transform">
           <i className="fa-solid fa-bolt text-2xl"></i>
         </div>
         <div className="flex flex-col">
-          <span className="font-black text-xl tracking-tighter leading-none">DefectSeeker</span>
-          <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em] mt-1">Enterprise</span>
+          <span className="font-black text-2xl tracking-tighter leading-none">DefectSeeker</span>
+          <span className="text-[9px] text-indigo-400 font-black uppercase tracking-[0.3em] mt-1.5 bg-indigo-400/10 px-2 py-0.5 rounded-full w-fit">MVP PRO</span>
         </div>
       </div>
       
-      <div className="flex-1 px-4 py-4 space-y-8 overflow-y-auto">
+      <div className="flex-1 px-6 py-4 space-y-10 overflow-y-auto custom-scrollbar">
         <div>
-          <p className="px-4 mb-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Main Menu</p>
-          <nav className="space-y-1">
+          <p className="px-4 mb-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.25em]">Workflow Management</p>
+          <nav className="space-y-1.5">
             {links.map(link => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) => 
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  `flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all group ${
+                    isActive ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`
                 }
               >
-                <i className={`fa-solid ${link.icon} w-5 text-lg`}></i>
-                <span className="font-bold text-sm">{link.label}</span>
+                <i className={`fa-solid ${link.icon} w-5 text-xl transition-transform group-hover:scale-110`}></i>
+                <span className="font-bold text-sm tracking-tight">{link.label}</span>
               </NavLink>
             ))}
           </nav>
@@ -61,20 +63,20 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
 
         {managementLinks.length > 0 && (
           <div>
-            <p className="px-4 mb-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Management</p>
-            <nav className="space-y-1">
+            <p className="px-4 mb-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.25em]">Control Plane</p>
+            <nav className="space-y-1.5">
               {managementLinks.map(link => (
                 <NavLink
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) => 
-                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    `flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all group ${
+                      isActive ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`
                   }
                 >
-                  <i className={`fa-solid ${link.icon} w-5 text-lg`}></i>
-                  <span className="font-bold text-sm">{link.label}</span>
+                  <i className={`fa-solid ${link.icon} w-5 text-xl transition-transform group-hover:scale-110`}></i>
+                  <span className="font-bold text-sm tracking-tight">{link.label}</span>
                 </NavLink>
               ))}
             </nav>
@@ -82,23 +84,19 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
         )}
       </div>
 
-      <div className="p-6">
-        <NavLink to="/profile" className="flex items-center justify-between gap-3 px-4 py-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 group">
+      <div className="p-8 border-t border-white/5 bg-white/5">
+        <NavLink to="/profile" className="flex items-center justify-between gap-4 p-4 bg-slate-800/50 rounded-3xl hover:bg-slate-800 transition-all border border-white/5 group shadow-inner">
           <div className="flex items-center gap-3 min-w-0">
-             <i className="fa-solid fa-user-circle text-xl text-indigo-400"></i>
-             <span className="text-xs font-bold truncate">My Workspace</span>
+             <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+               <i className="fa-solid fa-user-circle text-xl"></i>
+             </div>
+             <div className="flex flex-col min-w-0">
+               <span className="text-xs font-black truncate">User Profile</span>
+               <span className="text-[8px] text-slate-500 font-bold uppercase truncate tracking-widest">Active Session</span>
+             </div>
           </div>
           <i className="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:translate-x-1 transition-transform"></i>
         </NavLink>
-        <div className="mt-4 px-4">
-           <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">v2.5.0-Stable</span>
-           </div>
-        </div>
       </div>
     </aside>
   );

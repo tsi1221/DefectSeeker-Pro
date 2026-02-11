@@ -18,48 +18,47 @@ export const MOCK_PROJECTS: Project[] = [
 ];
 
 export const MOCK_USERS: User[] = [
-  { id: 'u1', name: 'Alice Smith', email: 'alice@defectseeker.pro', role: UserRole.MANAGER, avatar: 'https://picsum.photos/seed/alice/100' },
-  { id: 'u2', name: 'Bob Johnson', email: 'bob@defectseeker.pro', role: UserRole.QA, avatar: 'https://picsum.photos/seed/bob/100' },
-  { id: 'u3', name: 'Charlie Davis', email: 'charlie@defectseeker.pro', role: UserRole.DEVELOPER, avatar: 'https://picsum.photos/seed/charlie/100' },
-  { id: 'u4', name: 'Diana Prince', email: 'diana@defectseeker.pro', role: UserRole.DEVELOPER, avatar: 'https://picsum.photos/seed/diana/100' },
+  { id: 'admin', name: 'System Admin', email: 'admin@defectseeker.pro', role: UserRole.ADMIN, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin' },
+  { id: 'u1', name: 'Alice Smith', email: 'alice@defectseeker.pro', role: UserRole.MANAGER, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice' },
+  { id: 'u2', name: 'Bob Johnson', email: 'bob@defectseeker.pro', role: UserRole.QA, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob' },
+  { id: 'u3', name: 'Charlie Davis', email: 'charlie@defectseeker.pro', role: UserRole.DEVELOPER, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie' },
 ];
 
 export const INITIAL_DEFECTS: Defect[] = [
   {
     id: 'DEF-101',
-    title: 'Login page crashes on mobile',
-    description: 'When tapping the login button on iOS Chrome, the app crashes completely.',
+    title: 'Authentication bypass via token manipulation',
+    description: 'Exploit found where modifying the JWT sub field allows acting as another user.',
     status: DefectStatus.OPEN,
     severity: DefectSeverity.CRITICAL,
+    predictedSeverity: DefectSeverity.CRITICAL,
+    category: 'Security',
+    reporterId: 'u2',
+    assigneeId: 'u3',
+    projectId: 'p2',
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000).toISOString(),
+    comments: [],
+    aiReasoning: 'Security vulnerability involving authentication bypass is a critical threat.'
+  },
+  {
+    id: 'DEF-102',
+    title: 'Button color mismatch on dark mode',
+    description: 'The primary button is indigo-600 in light mode but hard to see in dark mode.',
+    status: DefectStatus.IN_PROGRESS,
+    severity: DefectSeverity.LOW,
+    predictedSeverity: DefectSeverity.LOW,
     category: 'UI/UX',
     reporterId: 'u2',
     assigneeId: 'u3',
     projectId: 'p1',
-    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000).toISOString(),
-    comments: [
-      { id: 'c1', authorId: 'u3', authorName: 'Charlie Davis', content: 'Checking logs now. Might be a CSS animation issue.', createdAt: new Date(Date.now() - 86400000).toISOString() }
-    ],
-    aiReasoning: 'Critical crash in core functionality (Login) affecting mobile users.'
-  },
-  {
-    id: 'DEF-102',
-    title: 'Profile image not uploading',
-    description: 'The S3 bucket returns a 403 error when trying to upload profile pics.',
-    status: DefectStatus.IN_PROGRESS,
-    severity: DefectSeverity.HIGH,
-    category: 'Backend API',
-    reporterId: 'u2',
-    assigneeId: 'u4',
-    projectId: 'p2',
-    createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    updatedAt: new Date().toISOString(),
     comments: [],
-    aiReasoning: 'Major feature failure affecting user profile completeness.'
+    aiReasoning: 'Visual inconsistency without functional impact is typically low severity.'
   }
 ];
 
 export const INITIAL_NOTIFICATIONS: Notification[] = [
-  { id: 'n1', userId: 'u1', type: 'Alert', title: 'High Severity Issue', message: 'A new critical defect has been logged for Phoenix Redesign.', read: false, createdAt: new Date().toISOString() },
-  { id: 'n2', userId: 'u3', type: 'Assignment', title: 'New Bug Assigned', message: 'You have been assigned DEF-101.', read: true, createdAt: new Date(Date.now() - 3600000).toISOString() },
+  { id: 'n1', userId: 'admin', type: 'Alert', title: 'System Initialization', message: 'Welcome to DefectSeeker Pro. All modules are online.', read: false, createdAt: new Date().toISOString() },
 ];

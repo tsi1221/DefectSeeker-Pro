@@ -2,7 +2,8 @@
 export enum UserRole {
   QA = 'QA Tester',
   DEVELOPER = 'Developer',
-  MANAGER = 'Project Manager'
+  MANAGER = 'Project Manager',
+  ADMIN = 'System Administrator'
 }
 
 export enum DefectStatus {
@@ -26,6 +27,7 @@ export interface User {
   email: string;
   role: UserRole;
   avatar: string;
+  password?: string; // Included for simulation
 }
 
 export interface Comment {
@@ -42,6 +44,7 @@ export interface Defect {
   description: string;
   status: DefectStatus;
   severity: DefectSeverity;
+  predictedSeverity?: DefectSeverity; // From AI
   category: string;
   reporterId: string;
   assigneeId?: string;
